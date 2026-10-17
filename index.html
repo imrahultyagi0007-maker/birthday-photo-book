@@ -1,328 +1,910 @@
 <!doctype html>
 <html lang="en">
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="theme-color" content="#f8edf1">
-  <title>A Little World of Us ♡</title>
-  <style>
-    :root {
-      --ink: #573b4a;
-      --muted: #927483;
-      --paper: #fffaf7;
-      --rose: #d58ba5;
-      --rose-dark: #a95d7b;
-      --line: #f0dfe6;
-      --shadow: 0 24px 70px rgba(91, 51, 72, .16);
-    }
-    * { box-sizing: border-box; }
-    html { min-height: 100%; background: #f8edf1; }
-    body {
-      margin: 0; min-height: 100vh; color: var(--ink);
-      font-family: "Palatino Linotype", Palatino, Georgia, serif;
-      background:
-        radial-gradient(ellipse at 12% 15%, rgba(255,255,255,.95), transparent 38%),
-        radial-gradient(ellipse at 90% 80%, rgba(232,188,207,.38), transparent 35%),
-        linear-gradient(135deg, #fbf3f5, #f5e5ec 55%, #fdf6f3);
-      overflow-x: hidden;
-    }
-    button { font: inherit; }
-    .glow { position: fixed; pointer-events: none; width: 230px; height: 230px; border-radius: 50%; filter: blur(60px); opacity: .23; z-index: 0; }
-    .glow.one { background: #e7a9c2; top: 8%; left: -100px; }
-    .glow.two { background: #f2c9b6; bottom: 0; right: -100px; }
-    .wrap { position: relative; z-index: 1; min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 28px 16px 22px; }
-    .eyebrow { font: 11px/1.4 Arial, sans-serif; letter-spacing: .24em; text-transform: uppercase; color: var(--muted); text-align: center; margin: 0 0 18px; }
-    h1, h2, p { margin-top: 0; }
-    .cover, .ending {
-      width: min(470px, 100%); min-height: 590px; display: flex; flex-direction: column; justify-content: center; align-items: center;
-      text-align: center; padding: 48px 30px; border: 1px solid rgba(255,255,255,.9); border-radius: 7px 18px 18px 7px;
-      background: linear-gradient(115deg, #fffaf8, #fff4f7); box-shadow: var(--shadow); position: relative; overflow: hidden;
-    }
-    .cover::before, .ending::before { content: ""; position: absolute; inset: 12px; border: 1px solid #eed6e0; border-radius: 4px 12px 12px 4px; pointer-events: none; }
-    .cover::after { content: "♡"; font-size: 42px; color: #d69bb1; margin-top: 16px; }
-    .cover h1 { font-size: clamp(42px, 8vw, 60px); font-weight: 400; line-height: 1.02; letter-spacing: -.04em; margin-bottom: 18px; }
-    .cover .subtitle { color: var(--muted); max-width: 270px; line-height: 1.7; font-size: 16px; }
-    .tiny { font: 10px Arial, sans-serif; letter-spacing: .2em; text-transform: uppercase; color: #b18b9c; margin-bottom: 26px; }
-    .primary, .soft-button {
-      border: 0; cursor: pointer; border-radius: 999px; padding: 13px 21px; transition: transform .2s, background .2s;
-    }
-    .primary { background: var(--rose-dark); color: white; box-shadow: 0 8px 20px rgba(169,93,123,.2); margin-top: 16px; }
-    .primary:hover, .soft-button:hover { transform: translateY(-2px); }
-    .soft-button { color: var(--ink); background: rgba(255,255,255,.75); border: 1px solid #ead4df; padding: 10px 15px; font: 12px Arial, sans-serif; }
-    .hidden { display: none !important; }
-    .book-area { width: min(1000px, 100%); }
-    .book-heading { text-align: center; margin-bottom: 20px; }
-    .book-heading h2 { font-size: clamp(26px, 4vw, 35px); font-weight: 400; margin-bottom: 7px; }
-    .book-heading p { font: 12px Arial, sans-serif; color: var(--muted); letter-spacing: .06em; }
-    .book {
-      display: grid; grid-template-columns: 1fr 1fr; perspective: 1800px; position: relative;
-      border-radius: 8px; box-shadow: var(--shadow); isolation: isolate;
-    }
-    .page {
-      min-width: 0; min-height: 510px; background: var(--paper); position: relative; overflow: hidden;
-      border: 1px solid #f0e0e5; padding: clamp(17px, 3vw, 32px);
-    }
-    .page.left { border-radius: 8px 0 0 8px; border-right: 0; box-shadow: inset -12px 0 20px -20px rgba(76,40,60,.4); }
-    .page.right { border-radius: 0 8px 8px 0; border-left: 1px solid #e9d6df; background: linear-gradient(90deg, #fbf4f0, #fffaf7 10%); }
-    .page.right::before { content: ""; position: absolute; top: 0; bottom: 0; left: 0; width: 12px; background: linear-gradient(90deg, rgba(113,70,90,.07), transparent); }
-    .photo-frame { height: 100%; min-height: 350px; display: flex; flex-direction: column; justify-content: center; align-items: center; position: relative; padding: 13px 13px 45px; background: #fff; box-shadow: 0 4px 18px rgba(82,49,65,.12); transform: rotate(-1deg); }
-    .photo-frame img { display: block; width: 100%; height: 100%; min-height: 300px; max-height: 430px; object-fit: cover; background: #f5e7ed; }
-    .photo-frame img.broken { display: none; }
-    .photo-placeholder { display: none; width: 100%; min-height: 300px; flex: 1; align-items: center; justify-content: center; flex-direction: column; gap: 12px; text-align: center; padding: 24px; color: #9c7286; background: linear-gradient(145deg,#f8e7ee,#fff4ef); }
-    .photo-placeholder.show { display: flex; }
-    .photo-placeholder .heart { font-size: 44px; color: #d28da8; }
-    .photo-caption { position: absolute; bottom: 13px; left: 10px; right: 10px; text-align: center; color: #98798a; font-size: 13px; font-style: italic; }
-    .story { position: relative; z-index: 1; height: 100%; display: flex; flex-direction: column; justify-content: center; padding: 12px clamp(3px, 1.3vw, 16px); }
-    .story .number { font: 10px Arial, sans-serif; letter-spacing: .2em; text-transform: uppercase; color: #b18498; margin-bottom: 24px; }
-    .story h3 { font-size: clamp(25px, 3vw, 37px); font-weight: 400; line-height: 1.12; margin-bottom: 20px; }
-    .story p { color: #775969; font-size: clamp(15px, 1.7vw, 17px); line-height: 1.9; white-space: pre-line; }
-    .story .date { font: 11px Arial, sans-serif; color: #ad8799; letter-spacing: .08em; margin-top: 10px; }
-    .story .ornament { color: #d69ab2; font-size: 23px; margin-top: 20px; }
-    .controls { display: flex; align-items: center; justify-content: center; gap: 12px; flex-wrap: wrap; margin-top: 20px; }
-    .progress { text-align: center; color: var(--muted); font: 11px Arial, sans-serif; letter-spacing: .12em; min-width: 82px; }
-    .hint { text-align: center; color: #a58a98; font: 11px Arial, sans-serif; margin-top: 13px; }
-    .turn-sheet { display: none; position: absolute; inset: 0 0 0 50%; z-index: 4; transform-origin: left center; background: linear-gradient(90deg,#f6e9ed,#fffaf7 15%,#fff7f5); border: 1px solid #ead6df; box-shadow: 6px 0 20px rgba(79,42,62,.12); backface-visibility: hidden; pointer-events: none; }
-    .book.turning-next .turn-sheet, .book.turning-prev .turn-sheet { display: block; }
-    .book.turning-next .turn-sheet { animation: flipNext .58s ease-in-out forwards; }
-    .book.turning-prev .turn-sheet { animation: flipPrev .58s ease-in-out forwards; }
-    @keyframes flipNext { 0% { transform: rotateY(0); } 100% { transform: rotateY(-180deg); } }
-    @keyframes flipPrev { 0% { transform: rotateY(-180deg); } 100% { transform: rotateY(0); } }
-    .ending { min-height: 590px; }
-    .ending h2 { font-size: clamp(34px, 7vw, 48px); font-weight: 400; line-height: 1.1; }
-    .letter { max-width: 320px; color: #775969; line-height: 1.95; white-space: pre-line; font-size: 16px; }
-    .signature { color: var(--rose-dark); font-style: italic; font-size: 23px; margin-top: 10px; }
-    .footer { margin-top: 22px; color: #b294a2; font: 10px Arial, sans-serif; letter-spacing: .12em; text-align: center; }
-    .sparkle { position: fixed; color: #d89ab4; opacity: .55; pointer-events: none; animation: float 8s ease-in-out infinite; z-index: 0; }
-    .s1 { left: 8%; top: 22%; font-size: 18px; } .s2 { right: 9%; top: 30%; font-size: 14px; animation-delay: -3s; } .s3 { right: 15%; bottom: 13%; font-size: 22px; animation-delay: -5s; }
-    @keyframes float { 0%,100% { transform: translateY(0) rotate(0); } 50% { transform: translateY(-15px) rotate(10deg); } }
-    @media (max-width: 680px) {
-      .wrap { padding: 18px 12px; }
-      .cover, .ending { min-height: 72vh; padding: 38px 25px; }
-      .book { grid-template-columns: 1fr; }
-      .page { min-height: 0; }
-      .page.left { border-radius: 8px 8px 0 0; border-right: 1px solid #f0e0e5; border-bottom: 0; padding: 17px; }
-      .page.right { border-radius: 0 0 8px 8px; border-left: 1px solid #f0e0e5; background: var(--paper); padding: 23px 24px 28px; }
-      .page.right::before { display: none; }
-      .photo-frame { min-height: 0; max-height: 42vh; padding: 9px 9px 35px; }
-      .photo-frame img, .photo-placeholder { min-height: 0; height: 36vh; max-height: 330px; }
-      .photo-caption { bottom: 9px; font-size: 12px; }
-      .story { padding: 5px 0; }
-      .story .number { margin-bottom: 14px; }
-      .story h3 { font-size: 29px; margin-bottom: 12px; }
-      .story p { font-size: 15px; line-height: 1.75; }
-      .story .ornament { margin-top: 10px; }
-      .turn-sheet { display: none !important; }
-      .book.turning-next, .book.turning-prev { animation: softPage .42s ease; }
-      @keyframes softPage { 50% { opacity: .55; transform: translateX(5px); } }
-      .controls { gap: 8px; }
-      .soft-button { padding: 10px 12px; }
-      .sparkle { opacity: .28; }
-    }
-    @media (prefers-reduced-motion: reduce) {
-      *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; scroll-behavior: auto !important; }
-    }
-  </style>
-</head>
-<body>
-  <div class="glow one"></div><div class="glow two"></div>
-  <span class="sparkle s1">✧</span><span class="sparkle s2">✦</span><span class="sparkle s3">♡</span>
-  <main class="wrap">
-    <section id="cover" class="cover">
-      <div class="tiny">A little something, just for you</div>
-      <h1>A Little<br>World of Us</h1>
-      <p class="subtitle">A few favourite moments, a few things I want you to know, and a whole lot of love.</p>
-      <button class="primary" id="openBook">Open your gift&nbsp; ♡</button>
-    </section>
-
-    <section id="bookArea" class="book-area hidden" aria-label="Photo book">
-      <header class="book-heading">
-        <p class="eyebrow">Our little story</p>
-        <h2>Some moments are home.</h2>
-        <p>Turn the page whenever you're ready ♡</p>
-      </header>
-      <div id="book" class="book">
-        <article class="page left">
-          <div class="photo-frame">
-            <img id="photo" src="photos/photo-1.jpg" alt="A memory of us">
-            <div id="photoPlaceholder" class="photo-placeholder">
-              <span class="heart">♡</span>
-              <strong id="placeholderTitle">Our memory goes here</strong>
-              <span style="font:12px Arial,sans-serif;line-height:1.7">Add your picture as<br><code id="placeholderFile">photo-1.jpg</code><br>inside the photos folder.</span>
-            </div>
-            <div class="photo-caption" id="caption">one of my favourite days</div>
-          </div>
-        </article>
-        <article class="page right">
-          <div class="story">
-            <div class="number" id="pageNumber">MEMORY 01</div>
-            <h3 id="storyTitle">The little things</h3>
-            <p id="storyText">Some memories become special without even trying.</p>
-            <div class="date" id="storyDate"></div>
-            <div class="ornament">✧ &nbsp; ♡ &nbsp; ✧</div>
-          </div>
-        </article>
-        <div class="turn-sheet" aria-hidden="true"></div>
-      </div>
-      <div class="controls">
-        <button class="soft-button" id="prevBtn">← Previous</button>
-        <span class="progress" id="progress">01 / 08</span>
-        <button class="soft-button" id="nextBtn">Next page →</button>
-        <button class="soft-button" id="musicBtn" aria-pressed="false">♫ Play our song</button>
-      </div>
-      <p class="hint">On a phone, just scroll and tap next. Take your time.</p>
-    </section>
-
-    <section id="ending" class="ending hidden">
-      <div class="tiny">One last little thing</div>
-      <h2>For you,<br>always. ♡</h2>
-      <p class="letter" id="letterText">Happy birthday, my love.
-
-I hope this little book reminds you of how many beautiful moments we've already collected, and how many more are waiting for us.
-
-Thank you for being you. You make ordinary days feel special, and I'm so glad I get to know you, laugh with you, and make memories with you.
-
-I hope this next year brings you the kind of happiness you give to the people around you. You deserve so much of it.
-
-Happy birthday. I love you. ♡</p>
-      <div class="signature">Yours, always</div>
-      <button class="primary" id="readAgain">Read our story again</button>
-    </section>
-    <div class="footer">MADE WITH LOVE, JUST FOR YOU ♡</div>
-  </main>
-
-  <audio id="song" src="music/our-song.mp3" preload="none" loop></audio>
-  <script>
-    // PERSONALIZE THIS LIST: change titles, notes, dates and captions.
-    // Keep image filenames photo-1.jpg through photo-8.jpg, or update each `image`.
-    const memories = [
-      { image: "photos/photo-1.jpg", title: "The little things", caption: "one of my favourite days", date: "A memory I'll keep", note: "Some memories become special without even trying. Maybe it's the way we laughed, the way time went too quickly, or just how happy I felt being there with you. I wish I could bottle up little moments like this and keep them forever." },
-      { image: "photos/photo-2.jpg", title: "That smile of yours", caption: "you, being you ♡", date: "", note: "I don't think you realise how easily your smile changes my mood. It's such a small thing, but it stays with me long after the moment is over. This photo is a tiny reminder of one of the many reasons you're so special to me." },
-      { image: "photos/photo-3.jpg", title: "A day worth keeping", caption: "one for the memory book", date: "", note: "If I could revisit one ordinary minute from this day, I probably would. Not because everything was perfect, but because it was ours. Those are the moments I end up treasuring the most." },
-      { image: "photos/photo-4.jpg", title: "My favourite company", caption: "better because you're there", date: "", note: "It's funny how the place matters a little less when I'm with the right person. Thank you for the conversations, the silly jokes, and the comfortable silences. I love getting to share bits of life with you." },
-      { image: "photos/photo-5.jpg", title: "A little bit of magic", caption: "still makes me smile", date: "", note: "Every now and then, I look back at a photo and remember not just what happened, but exactly how it felt. This is one of those pictures. I hope we keep finding reasons to make more memories like this." },
-      { image: "photos/photo-6.jpg", title: "The way we laugh", caption: "please never change that", date: "", note: "One of my favourite things about us is that we can make a moment out of almost nothing. I hope we never run out of things to laugh about, even the jokes that make absolutely no sense to anyone else." },
-      { image: "photos/photo-7.jpg", title: "A moment, just ours", caption: "if only photos had sound", date: "", note: "If this picture had sound, I wonder what we'd hear first — our voices, our laughter, or something completely random. Whatever it is, I know it would bring this moment right back to me." },
-      { image: "photos/photo-8.jpg", title: "More pages to come", caption: "this is only the beginning ♡", date: "", note: "We've already made so many memories, and somehow there are still so many firsts, little adventures, and ordinary days ahead of us. I can't promise every day will be perfect, but I hope we keep choosing to make the most of them together." }
-    ];
-
-    // Replace this with your own letter when you're ready.
-    const personalLetter = `Happy birthday, my love.
-
-I hope this little book reminds you of how many beautiful moments we've already collected, and how many more are waiting for us.
-
-Thank you for being you. You make ordinary days feel special, and I'm so glad I get to know you, laugh with you, and make memories with you.
-
-I hope this next year brings you the kind of happiness you give to the people around you. You deserve so much of it.
-
-Happy birthday. I love you. ♡`;
-
-    const cover = document.getElementById("cover");
-    const bookArea = document.getElementById("bookArea");
-    const ending = document.getElementById("ending");
-    const book = document.getElementById("book");
-    const photo = document.getElementById("photo");
-    const photoPlaceholder = document.getElementById("photoPlaceholder");
-    const caption = document.getElementById("caption");
-    const pageNumber = document.getElementById("pageNumber");
-    const storyTitle = document.getElementById("storyTitle");
-    const storyText = document.getElementById("storyText");
-    const storyDate = document.getElementById("storyDate");
-    const progress = document.getElementById("progress");
-    const prevBtn = document.getElementById("prevBtn");
-    const nextBtn = document.getElementById("nextBtn");
-    const musicBtn = document.getElementById("musicBtn");
-    const song = document.getElementById("song");
-    let current = 0;
-    let busy = false;
-
-    function renderMemory() {
-      const m = memories[current];
-      photo.classList.remove("broken");
-      photoPlaceholder.classList.remove("show");
-      photo.onload = () => { photo.classList.remove("broken"); photoPlaceholder.classList.remove("show"); };
-      photo.onerror = () => {
-        photo.classList.add("broken");
-        photoPlaceholder.classList.add("show");
-        document.getElementById("placeholderTitle").textContent = m.title;
-        document.getElementById("placeholderFile").textContent = m.image.split("/").pop();
-      };
-      photo.src = m.image;
-      photo.alt = m.caption || m.title;
-      caption.textContent = m.caption || "a little memory of us";
-      pageNumber.textContent = "MEMORY " + String(current + 1).padStart(2, "0");
-      storyTitle.textContent = m.title;
-      storyText.textContent = m.note;
-      storyDate.textContent = m.date || "";
-      progress.textContent = String(current + 1).padStart(2, "0") + " / " + String(memories.length).padStart(2, "0");
-      prevBtn.disabled = current === 0;
-      prevBtn.style.opacity = current === 0 ? ".45" : "1";
-      nextBtn.textContent = current === memories.length - 1 ? "The last page →" : "Next page →";
-    }
-
-    function turn(direction) {
-      if (busy) return;
-      if (direction > 0 && current === memories.length - 1) { showEnding(); return; }
-      if (direction < 0 && current === 0) return;
-      busy = true;
-      book.classList.remove("turning-next", "turning-prev");
-      void book.offsetWidth;
-      book.classList.add(direction > 0 ? "turning-next" : "turning-prev");
-      setTimeout(() => {
-        current += direction;
-        renderMemory();
-        book.classList.remove("turning-next", "turning-prev");
-        busy = false;
-      }, 430);
-    }
-
-    function showEnding() {
-      bookArea.classList.add("hidden");
-      ending.classList.remove("hidden");
-      document.getElementById("letterText").textContent = personalLetter;
-      window.scrollTo({ top: 0, behavior: "smooth" });
-    }
-
-    document.getElementById("openBook").addEventListener("click", () => {
-      cover.classList.add("hidden");
-      bookArea.classList.remove("hidden");
-      current = 0;
-      renderMemory();
-      window.scrollTo({ top: 0, behavior: "smooth" });
-    });
-    prevBtn.addEventListener("click", () => turn(-1));
-    nextBtn.addEventListener("click", () => turn(1));
-    document.getElementById("readAgain").addEventListener("click", () => {
-      ending.classList.add("hidden");
-      bookArea.classList.remove("hidden");
-      current = 0;
-      renderMemory();
-      window.scrollTo({ top: 0, behavior: "smooth" });
-    });
-    musicBtn.addEventListener("click", async () => {
-      if (song.paused) {
-        try {
-          await song.play();
-          musicBtn.textContent = "♫ Pause our song";
-          musicBtn.setAttribute("aria-pressed", "true");
-        } catch (e) {
-          alert("Add your chosen audio file at music/our-song.mp3, then try again.");
-        }
-      } else {
-        song.pause();
-        musicBtn.textContent = "♫ Play our song";
-        musicBtn.setAttribute("aria-pressed", "false");
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#f8edf1" />
+    <title>A Little World of Us ♡</title>
+    <style>
+      :root {
+        --ink: #573b4a;
+        --muted: #927483;
+        --paper: #fffaf7;
+        --rose: #d58ba5;
+        --rose-dark: #a95d7b;
+        --line: #f0dfe6;
+        --shadow: 0 24px 70px rgba(91, 51, 72, 0.16);
       }
-    });
-    song.addEventListener("ended", () => {
-      musicBtn.textContent = "♫ Play our song";
-      musicBtn.setAttribute("aria-pressed", "false");
-    });
-    document.addEventListener("keydown", e => {
-      if (bookArea.classList.contains("hidden")) return;
-      if (e.key === "ArrowRight") turn(1);
-      if (e.key === "ArrowLeft") turn(-1);
-    });
-    renderMemory();
-  </script>
-</body>
+      * {
+        box-sizing: border-box;
+      }
+      html {
+        min-height: 100%;
+        background: #f8edf1;
+      }
+      body {
+        margin: 0;
+        min-height: 100vh;
+        color: var(--ink);
+        font-family: "Palatino Linotype", Palatino, Georgia, serif;
+        background:
+          radial-gradient(
+            ellipse at 12% 15%,
+            rgba(255, 255, 255, 0.95),
+            transparent 38%
+          ),
+          radial-gradient(
+            ellipse at 90% 80%,
+            rgba(232, 188, 207, 0.38),
+            transparent 35%
+          ),
+          linear-gradient(135deg, #fbf3f5, #f5e5ec 55%, #fdf6f3);
+        overflow-x: hidden;
+      }
+      button {
+        font: inherit;
+      }
+      .glow {
+        position: fixed;
+        pointer-events: none;
+        width: 230px;
+        height: 230px;
+        border-radius: 50%;
+        filter: blur(60px);
+        opacity: 0.23;
+        z-index: 0;
+      }
+      .glow.one {
+        background: #e7a9c2;
+        top: 8%;
+        left: -100px;
+      }
+      .glow.two {
+        background: #f2c9b6;
+        bottom: 0;
+        right: -100px;
+      }
+      .wrap {
+        position: relative;
+        z-index: 1;
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 28px 16px 22px;
+      }
+      .eyebrow {
+        font:
+          11px/1.4 Arial,
+          sans-serif;
+        letter-spacing: 0.24em;
+        text-transform: uppercase;
+        color: var(--muted);
+        text-align: center;
+        margin: 0 0 18px;
+      }
+      h1,
+      h2,
+      p {
+        margin-top: 0;
+      }
+      .cover,
+      .ending {
+        width: min(470px, 100%);
+        min-height: 590px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        text-align: center;
+        padding: 48px 30px;
+        border: 1px solid rgba(255, 255, 255, 0.9);
+        border-radius: 7px 18px 18px 7px;
+        background: linear-gradient(115deg, #fffaf8, #fff4f7);
+        box-shadow: var(--shadow);
+        position: relative;
+        overflow: hidden;
+      }
+      .cover::before,
+      .ending::before {
+        content: "";
+        position: absolute;
+        inset: 12px;
+        border: 1px solid #eed6e0;
+        border-radius: 4px 12px 12px 4px;
+        pointer-events: none;
+      }
+      .cover::after {
+        content: "♡";
+        font-size: 42px;
+        color: #d69bb1;
+        margin-top: 16px;
+      }
+      .cover h1 {
+        font-size: clamp(42px, 8vw, 60px);
+        font-weight: 400;
+        line-height: 1.02;
+        letter-spacing: -0.04em;
+        margin-bottom: 18px;
+      }
+      .cover .subtitle {
+        color: var(--muted);
+        max-width: 270px;
+        line-height: 1.7;
+        font-size: 16px;
+      }
+      .tiny {
+        font:
+          10px Arial,
+          sans-serif;
+        letter-spacing: 0.2em;
+        text-transform: uppercase;
+        color: #b18b9c;
+        margin-bottom: 26px;
+      }
+      .primary,
+      .soft-button {
+        border: 0;
+        cursor: pointer;
+        border-radius: 999px;
+        padding: 13px 21px;
+        transition:
+          transform 0.2s,
+          background 0.2s;
+      }
+      .primary {
+        background: var(--rose-dark);
+        color: white;
+        box-shadow: 0 8px 20px rgba(169, 93, 123, 0.2);
+        margin-top: 16px;
+      }
+      .primary:hover,
+      .soft-button:hover {
+        transform: translateY(-2px);
+      }
+      .soft-button {
+        color: var(--ink);
+        background: rgba(255, 255, 255, 0.75);
+        border: 1px solid #ead4df;
+        padding: 10px 15px;
+        font:
+          12px Arial,
+          sans-serif;
+      }
+      .hidden {
+        display: none !important;
+      }
+      .book-area {
+        width: min(1000px, 100%);
+      }
+      .book-heading {
+        text-align: center;
+        margin-bottom: 20px;
+      }
+      .book-heading h2 {
+        font-size: clamp(26px, 4vw, 35px);
+        font-weight: 400;
+        margin-bottom: 7px;
+      }
+      .book-heading p {
+        font:
+          12px Arial,
+          sans-serif;
+        color: var(--muted);
+        letter-spacing: 0.06em;
+      }
+      .book {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        perspective: 1800px;
+        position: relative;
+        border-radius: 8px;
+        box-shadow: var(--shadow);
+        isolation: isolate;
+      }
+      .page {
+        min-width: 0;
+        min-height: 510px;
+        background: var(--paper);
+        position: relative;
+        overflow: hidden;
+        border: 1px solid #f0e0e5;
+        padding: clamp(17px, 3vw, 32px);
+      }
+      .page.left {
+        border-radius: 8px 0 0 8px;
+        border-right: 0;
+        box-shadow: inset -12px 0 20px -20px rgba(76, 40, 60, 0.4);
+      }
+      .page.right {
+        border-radius: 0 8px 8px 0;
+        border-left: 1px solid #e9d6df;
+        background: linear-gradient(90deg, #fbf4f0, #fffaf7 10%);
+      }
+      .page.right::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        left: 0;
+        width: 12px;
+        background: linear-gradient(
+          90deg,
+          rgba(113, 70, 90, 0.07),
+          transparent
+        );
+      }
+      .photo-frame {
+        height: 100%;
+        min-height: 350px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        position: relative;
+        padding: 13px 13px 45px;
+        background: #fff;
+        box-shadow: 0 4px 18px rgba(82, 49, 65, 0.12);
+        transform: rotate(-1deg);
+      }
+      .photo-frame img {
+        display: block;
+        width: 100%;
+        height: auto;
+        max-height: 430px;
+        object-fit: contain;
+        background: #f5e7ed;
+      }
+      .photo-frame img.broken {
+        display: none;
+      }
+      .photo-placeholder {
+        display: none;
+        width: 100%;
+        min-height: 300px;
+        flex: 1;
+        align-items: center;
+        justify-content: center;
+        flex-direction: column;
+        gap: 12px;
+        text-align: center;
+        padding: 24px;
+        color: #9c7286;
+        background: linear-gradient(145deg, #f8e7ee, #fff4ef);
+      }
+      .photo-placeholder.show {
+        display: flex;
+      }
+      .photo-placeholder .heart {
+        font-size: 44px;
+        color: #d28da8;
+      }
+      .photo-caption {
+        position: absolute;
+        bottom: 13px;
+        left: 10px;
+        right: 10px;
+        text-align: center;
+        color: #98798a;
+        font-size: 13px;
+        font-style: italic;
+      }
+      .story {
+        position: relative;
+        z-index: 1;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        padding: 12px clamp(3px, 1.3vw, 16px);
+      }
+      .story .number {
+        font:
+          10px Arial,
+          sans-serif;
+        letter-spacing: 0.2em;
+        text-transform: uppercase;
+        color: #b18498;
+        margin-bottom: 24px;
+      }
+      .story h3 {
+        font-size: clamp(25px, 3vw, 37px);
+        font-weight: 400;
+        line-height: 1.12;
+        margin-bottom: 20px;
+      }
+      .story p {
+        color: #775969;
+        font-size: clamp(15px, 1.7vw, 17px);
+        line-height: 1.9;
+        white-space: pre-line;
+      }
+      .story .date {
+        font:
+          11px Arial,
+          sans-serif;
+        color: #ad8799;
+        letter-spacing: 0.08em;
+        margin-top: 10px;
+      }
+      .story .ornament {
+        color: #d69ab2;
+        font-size: 23px;
+        margin-top: 20px;
+      }
+      .controls {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 12px;
+        flex-wrap: wrap;
+        margin-top: 20px;
+      }
+      .progress {
+        text-align: center;
+        color: var(--muted);
+        font:
+          11px Arial,
+          sans-serif;
+        letter-spacing: 0.12em;
+        min-width: 82px;
+      }
+      .hint {
+        text-align: center;
+        color: #a58a98;
+        font:
+          11px Arial,
+          sans-serif;
+        margin-top: 13px;
+      }
+      .turn-sheet {
+        display: none;
+        position: absolute;
+        inset: 0 0 0 50%;
+        z-index: 4;
+        transform-origin: left center;
+        background: linear-gradient(90deg, #f6e9ed, #fffaf7 15%, #fff7f5);
+        border: 1px solid #ead6df;
+        box-shadow: 6px 0 20px rgba(79, 42, 62, 0.12);
+        backface-visibility: hidden;
+        pointer-events: none;
+      }
+      .book.turning-next .turn-sheet,
+      .book.turning-prev .turn-sheet {
+        display: block;
+      }
+      .book.turning-next .turn-sheet {
+        animation: flipNext 0.58s ease-in-out forwards;
+      }
+      .book.turning-prev .turn-sheet {
+        animation: flipPrev 0.58s ease-in-out forwards;
+      }
+      @keyframes flipNext {
+        0% {
+          transform: rotateY(0);
+        }
+        100% {
+          transform: rotateY(-180deg);
+        }
+      }
+      @keyframes flipPrev {
+        0% {
+          transform: rotateY(-180deg);
+        }
+        100% {
+          transform: rotateY(0);
+        }
+      }
+      .ending {
+        min-height: 590px;
+      }
+      .ending h2 {
+        font-size: clamp(34px, 7vw, 48px);
+        font-weight: 400;
+        line-height: 1.1;
+      }
+      .letter {
+        max-width: 320px;
+        color: #775969;
+        line-height: 1.95;
+        white-space: pre-line;
+        font-size: 16px;
+      }
+      .signature {
+        color: var(--rose-dark);
+        font-style: italic;
+        font-size: 23px;
+        margin-top: 10px;
+      }
+      .footer {
+        margin-top: 22px;
+        color: #b294a2;
+        font:
+          10px Arial,
+          sans-serif;
+        letter-spacing: 0.12em;
+        text-align: center;
+      }
+      .sparkle {
+        position: fixed;
+        color: #d89ab4;
+        opacity: 0.55;
+        pointer-events: none;
+        animation: float 8s ease-in-out infinite;
+        z-index: 0;
+      }
+      .s1 {
+        left: 8%;
+        top: 22%;
+        font-size: 18px;
+      }
+      .s2 {
+        right: 9%;
+        top: 30%;
+        font-size: 14px;
+        animation-delay: -3s;
+      }
+      .s3 {
+        right: 15%;
+        bottom: 13%;
+        font-size: 22px;
+        animation-delay: -5s;
+      }
+      @keyframes float {
+        0%,
+        100% {
+          transform: translateY(0) rotate(0);
+        }
+        50% {
+          transform: translateY(-15px) rotate(10deg);
+        }
+      }
+
+      @media (max-width: 680px) {
+        .wrap {
+          min-height: 100svh;
+          padding: 10px 10px 14px;
+          justify-content: flex-start;
+        }
+
+        .cover,
+        .ending {
+          min-height: auto;
+          padding: 20px 20px;
+        }
+
+        .book-heading {
+          margin-bottom: 8px;
+        }
+
+        .book-heading .eyebrow {
+          margin-bottom: 6px;
+        }
+
+        .book-heading h2 {
+          font-size: 25px;
+          margin-bottom: 4px;
+        }
+
+        .book-heading p:last-child {
+          display: none;
+        }
+
+        .book {
+          grid-template-columns: 1fr;
+        }
+
+        .page {
+          min-height: 0;
+        }
+
+        .page.left {
+          border-radius: 8px 8px 0 0;
+          border-right: 1px solid #f0e0e5;
+          border-bottom: 0;
+          padding: 10px;
+        }
+
+        .page.right {
+          border-radius: 0 0 8px 8px;
+          border: 1px solid #f0e0e5;
+          padding: 15px 19px;
+          background: var(--paper);
+        }
+
+        .page.right::before {
+          display: none;
+        }
+
+        .photo-frame {
+          min-height: 0;
+          max-height: none;
+          padding: 7px 7px 28px;
+        }
+
+        .photo-frame img {
+          width: 100%;
+          height: 25svh;
+          min-height: 130px;
+          max-height: 220px;
+          object-fit: contain;
+        }
+
+        .photo-placeholder {
+          height: 25svh;
+          min-height: 130px;
+          max-height: 220px;
+        }
+
+        .photo-caption {
+          bottom: 6px;
+          font-size: 11px;
+        }
+
+        .story {
+          padding: 0;
+        }
+
+        .story .number {
+          margin-bottom: 8px;
+          font-size: 9px;
+        }
+
+        .story h3 {
+          font-size: 24px;
+          margin-bottom: 8px;
+        }
+
+        .story p {
+          font-size: 13px;
+          line-height: 1.5;
+          max-height: 16svh;
+          overflow-y: auto;
+        }
+
+        .story .date {
+          margin-top: 5px;
+        }
+
+        .story .ornament {
+          margin-top: 6px;
+          font-size: 17px;
+        }
+
+        .controls {
+          margin-top: 10px;
+          gap: 7px;
+        }
+
+        .soft-button {
+          padding: 9px 11px;
+          font-size: 11px;
+        }
+
+        .progress {
+          min-width: 55px;
+          font-size: 10px;
+        }
+
+        .hint {
+          display: none;
+        }
+
+        .turn-sheet {
+          display: none !important;
+        }
+
+        .book.turning-next,
+        .book.turning-prev {
+          animation: softPage 0.42s ease;
+        }
+
+        @keyframes softPage {
+          50% {
+            opacity: 0.65;
+            transform: translateX(4px);
+          }
+        }
+
+        .footer {
+          margin-top: 10px;
+        }
+
+        .sparkle {
+          opacity: 0.2;
+        }
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        *,
+        *::before,
+        *::after {
+          animation-duration: 0.01ms !important;
+          animation-iteration-count: 1 !important;
+          scroll-behavior: auto !important;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="glow one"></div>
+    <div class="glow two"></div>
+    <span class="sparkle s1">✧</span><span class="sparkle s2">✦</span
+    ><span class="sparkle s3">♡</span>
+    <main class="wrap">
+      <section id="cover" class="cover">
+        <div class="tiny">A little something, just for you</div>
+        <h1>A Little<br />World of Us</h1>
+        <p class="subtitle">
+          A few favourite moments, a few things I want you to know, and a whole
+          lot of love.
+        </p>
+        <button class="primary" id="openBook">Open your gift&nbsp; ♡</button>
+      </section>
+
+      <section id="bookArea" class="book-area hidden" aria-label="Photo book">
+        <header class="book-heading">
+          <p class="eyebrow">Our little story</p>
+          <h2>Some moments are home.</h2>
+          <p>Turn the page whenever you're ready ♡</p>
+        </header>
+        <div id="book" class="book">
+          <article class="page left">
+            <div class="photo-frame">
+              <img id="photo" src="photos/photo-1.jpg" alt="A memory of us" />
+              <div id="photoPlaceholder" class="photo-placeholder">
+                <span class="heart">♡</span>
+                <strong id="placeholderTitle">Our memory goes here</strong>
+                <span
+                  style="
+                    font:
+                      12px Arial,
+                      sans-serif;
+                    line-height: 1.7;
+                  "
+                  >Add your picture as<br /><code id="placeholderFile"
+                    >photo-1.jpg</code
+                  ><br />inside the photos folder.</span
+                >
+              </div>
+              <div class="photo-caption" id="caption">
+                one of my favourite days
+              </div>
+            </div>
+          </article>
+          <article class="page right">
+            <div class="story">
+              <div class="number" id="pageNumber">MEMORY 01</div>
+              <h3 id="storyTitle">The little things</h3>
+              <p id="storyText">
+                Some memories become special without even trying.
+              </p>
+              <div class="date" id="storyDate"></div>
+              <div class="ornament">✧ &nbsp; ♡ &nbsp; ✧</div>
+            </div>
+          </article>
+          <div class="turn-sheet" aria-hidden="true"></div>
+        </div>
+        <div class="controls">
+          <button class="soft-button" id="prevBtn">← Previous</button>
+          <span class="progress" id="progress">01 / 08</span>
+          <button class="soft-button" id="nextBtn">Next page →</button>
+          <button class="soft-button" id="musicBtn" aria-pressed="false">
+            ♫ Play our song
+          </button>
+        </div>
+        <p class="hint">
+          On a phone, just scroll and tap next. Take your time.
+        </p>
+      </section>
+
+      <section id="ending" class="ending hidden">
+        <div class="tiny">One last little thing</div>
+        <h2>For you,<br />always. ♡</h2>
+        <p class="letter" id="letterText">
+          Happy birthday, my love. I hope this little book reminds you of how
+          many beautiful moments we've already collected, and how many more are
+          waiting for us. Thank you for being you. You make ordinary days feel
+          special, and I'm so glad I get to know you, laugh with you, and make
+          memories with you. I hope this next year brings you the kind of
+          happiness you give to the people around you. You deserve so much of
+          it. Happy birthday. I love you. ♡
+        </p>
+        <div class="signature">Yours, always</div>
+        <button class="primary" id="readAgain">Read our story again</button>
+      </section>
+      <div class="footer">MADE WITH LOVE, JUST FOR YOU ♡</div>
+    </main>
+
+    <audio id="song" src="music/our-song.mp3" preload="none" loop></audio>
+    <script>
+            // PERSONALIZE THIS LIST: change titles, notes, dates and captions.
+            // Keep image filenames photo-1.jpg through photo-8.jpg, or update each `image`.
+            const memories = [
+              {
+                image: "photos/photo-1.jpeg",
+                title: "The Day It Became Us",
+                caption: "the beginning of my favourite story ♡",
+                note: "I think this will always be one of the most special moments of my life. The night we spent together, when it stopped being just you and me and became us. The initial excitement of being together with you the first time i was able to hold your hands and hug you it was so special, that was also the day i kissed you my very first kiss im glad it was you .  ♡",
+              },
+              {
+                image: "photos/photo-2.jpeg",
+                title: "A Sandwich, a Cute Top & You",
+                caption: "i could've stayed a little longer ♡",
+                note: "I still remember how pretty you looked that day in that cute top. I was just so happy to be sitting across from you, getting to spend a little more time with you. And of course, I remembered your love for paneer, so your favourite sandwich had to be the order. I just wish I hadn't had to leave so soon. I would've happily stayed a little longer with you. ♡",
+              },
+              {
+                image: "photos/photo-3.jpeg",
+                title: "A Pink Rose, Just for You",
+                caption: "you were the reason i chose pink ♡",
+                note: "You're the only person I've ever gifted flowers to, and I think there's a reason I chose a pink rose for you. It reminded me of you — bright, beautiful, and impossible not to notice. Even its colour reminded me of your lips. It was your last day in Delhi before you left for Uttarakhand, and I really wanted to see you, even if just for a little while. So I came with flowers and your favourite chocolates, hoping to make that day a little more special. I hope you know how much it meant to me to see you that day. ♡",
+              },
+              {
+                image: "photos/photo-4.jpeg",
+                title: "Your Hometown, My Favourite Ride",
+                caption: "your personal passenger princess ♡",
+                note: "I missed you enough to come all the way to Uttarakhand, just to see you and remind you how much you mattered to me. It was raining like crazy, and somehow, none of that mattered as much as getting to spend time with you. You showed me your hometown on your scooty while I happily played passenger princess. I even got to meet your friends that day. I loved getting a little glimpse into your world, and if I could relive that rainy day, I'd still make the trip just to see you. ♡",
+              },
+              {
+                image: "photos/photo-5.jpeg",
+                title: "Momos, Scootyride & You",
+                caption: "you make even messy meals adorable ♡",
+                note: "You took me to your favourite momo place in your hometown, and of course, we had to try those ridiculously spicy munchurian momos you love so much. 😂 Watching you eat is honestly a little adventure of its own — food going everywhere, you happily taking bites with your hands, completely enjoying yourself. I don't know how you make something as simple as eating so entertaining, but I love it. Somehow, food tastes a little better when I'm sharing it with you. ♡",
+              },
+              {
+                image: "photos/photo-6.jpeg",
+                title: "A Hilltop, Romantic Songs & You",
+                caption: "my favourite view was still you ♡",
+
+                note: "I still think about that beautiful scooty ride up the hill to the café. The views were incredible, the romantic songs were playing, and we were singing together like we had our own little world up there. Having you hold my waist while we rode made the whole thing feel even more special. And of course, even our little unexpected moments turned into memories I'll smile about later. I went there for the view and the food, but honestly, having you beside me was my favourite part of it all. ♡",
+              },
+            ];
+
+            const personalLetter =`Happy birthday, my love. ♡
+
+      I know I'm not perfect and I'll probably make mistakes sometimes. This is my first healthy, long relationship and honestly, I'm still learning a lot about how to be a good partner. I know there will be times when I mess up or don't understand things properly, but I do want to learn from them and try to do better. Just because I make a mistake doesn't mean I don't care about you or that I don't value what we have. I really do, more than I probably manage to show sometimes.
+
+      The past few years haven't exactly been the easiest for me. College, pressure and a lot of other things have been going on in my head. But then you came into my life and somehow things started feeling a little better. You came like sunshine on a cloudy day, and honestly, you're also like those beautiful sunsets that make you stop whatever you're doing just to look at them for a while.
+
+      I love your silly smile, your eyes, your tantrums, your cute expressions, the way you get shy and just all those little things about you. I don't think you realise how much I notice these things or how happy they make me. Sometimes I just look at you and think how did I get so lucky to have you in my life. I know this sounds cheesy but it's true. ♡
+
+      Long distance honestly sucks. I miss being around you, our random scooty rides, listening to songs together and laughing about the most random things. I miss all those little moments which might not seem like a big deal but mean so much to me. Sometimes I just wish you were here so I could hug you, hold you for a while and tell you how much I love you and how much I've missed you.
+
+      I made this little book because I don't want these memories to just be some photos sitting in my gallery. I want to remember how these moments felt, the little things we did and how happy I was just being with you. I know we still have so many things to do and so many memories to make, and I really look forward to all of them.
+
+      I know I won't always get everything right, but I hope you know that I genuinely care about you and about us. I want to understand you better, learn with you, laugh with you and make more beautiful memories together. We're both figuring things out, and I just want us to keep growing together.
+
+      I hope this birthday brings you lots of happiness, more reasons to smile and all the things you wish for. You deserve so much happiness, and I really hope I get to be a part of it.
+
+      And honestly, if I could ask for one thing right now, it would be to have you here with me, even if just for a little while, so I could hug you tightly and tell you all of this instead of writing it here.
+
+      I love you. I've missed you so much. And I'm really, really glad it's you. ♡
+
+      Yours, always. ♡`;
+
+            const cover = document.getElementById("cover");
+            const bookArea = document.getElementById("bookArea");
+            const ending = document.getElementById("ending");
+            const book = document.getElementById("book");
+            const photo = document.getElementById("photo");
+            const photoPlaceholder = document.getElementById("photoPlaceholder");
+            const caption = document.getElementById("caption");
+            const pageNumber = document.getElementById("pageNumber");
+            const storyTitle = document.getElementById("storyTitle");
+            const storyText = document.getElementById("storyText");
+            const storyDate = document.getElementById("storyDate");
+            const progress = document.getElementById("progress");
+            const prevBtn = document.getElementById("prevBtn");
+            const nextBtn = document.getElementById("nextBtn");
+            const musicBtn = document.getElementById("musicBtn");
+            const song = document.getElementById("song");
+            let current = 0;
+            let busy = false;
+
+            function renderMemory() {
+              const m = memories[current];
+              photo.classList.remove("broken");
+              photoPlaceholder.classList.remove("show");
+              photo.onload = () => {
+                photo.classList.remove("broken");
+                photoPlaceholder.classList.remove("show");
+              };
+              photo.onerror = () => {
+                photo.classList.add("broken");
+                photoPlaceholder.classList.add("show");
+                document.getElementById("placeholderTitle").textContent = m.title;
+                document.getElementById("placeholderFile").textContent = m.image
+                  .split("/")
+                  .pop();
+              };
+              photo.src = m.image;
+              photo.alt = m.caption || m.title;
+              caption.textContent = m.caption || "a little memory of us";
+              pageNumber.textContent =
+                "MEMORY " + String(current + 1).padStart(2, "0");
+              storyTitle.textContent = m.title;
+              storyText.textContent = m.note;
+              storyDate.textContent = m.date || "";
+              progress.textContent =
+                String(current + 1).padStart(2, "0") +
+                " / " +
+                String(memories.length).padStart(2, "0");
+              prevBtn.disabled = current === 0;
+              prevBtn.style.opacity = current === 0 ? ".45" : "1";
+              nextBtn.textContent =
+                current === memories.length - 1 ? "The last page →" : "Next page →";
+            }
+
+            function turn(direction) {
+              if (busy) return;
+              if (direction > 0 && current === memories.length - 1) {
+                showEnding();
+                return;
+              }
+              if (direction < 0 && current === 0) return;
+              busy = true;
+              book.classList.remove("turning-next", "turning-prev");
+              void book.offsetWidth;
+              book.classList.add(direction > 0 ? "turning-next" : "turning-prev");
+              setTimeout(() => {
+                current += direction;
+                renderMemory();
+                book.classList.remove("turning-next", "turning-prev");
+                busy = false;
+              }, 430);
+            }
+
+            function showEnding() {
+              bookArea.classList.add("hidden");
+              ending.classList.remove("hidden");
+              document.getElementById("letterText").textContent = personalLetter;
+              window.scrollTo({ top: 0, behavior: "smooth" });
+            }
+
+            document.getElementById("openBook").addEventListener("click", () => {
+              cover.classList.add("hidden");
+              bookArea.classList.remove("hidden");
+              current = 0;
+              renderMemory();
+              window.scrollTo({ top: 0, behavior: "smooth" });
+            });
+            prevBtn.addEventListener("click", () => turn(-1));
+            nextBtn.addEventListener("click", () => turn(1));
+            document.getElementById("readAgain").addEventListener("click", () => {
+              ending.classList.add("hidden");
+              bookArea.classList.remove("hidden");
+              current = 0;
+              renderMemory();
+              window.scrollTo({ top: 0, behavior: "smooth" });
+            });
+            musicBtn.addEventListener("click", async () => {
+              if (song.paused) {
+                try {
+                  await song.play();
+                  musicBtn.textContent = "♫ Pause our song";
+                  musicBtn.setAttribute("aria-pressed", "true");
+                } catch (e) {
+                  alert(
+                    "Add your chosen audio file at music/our-song.mp3, then try again.",
+                  );
+                }
+              } else {
+                song.pause();
+                musicBtn.textContent = "♫ Play our song";
+                musicBtn.setAttribute("aria-pressed", "false");
+              }
+            });
+            song.addEventListener("ended", () => {
+              musicBtn.textContent = "♫ Play our song";
+              musicBtn.setAttribute("aria-pressed", "false");
+            });
+            document.addEventListener("keydown", (e) => {
+              if (bookArea.classList.contains("hidden")) return;
+              if (e.key === "ArrowRight") turn(1);
+              if (e.key === "ArrowLeft") turn(-1);
+            });
+            renderMemory();
+    </script>
+  </body>
 </html>
